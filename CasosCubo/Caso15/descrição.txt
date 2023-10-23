@@ -1,0 +1,2 @@
+-> 70 cm de distância da câmera.
+-> Câmera: 640x480; 6.2 cm de baseline; 917.7 pixels de distância focal.
