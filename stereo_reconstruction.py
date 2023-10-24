@@ -23,7 +23,7 @@ def remap_images(image_left, image_right, stereoMapL_x, stereoMapL_y, stereoMapR
     rectifiedR = cv.remap(imgR, stereoMapR_x, stereoMapR_y, cv.INTER_LANCZOS4)
     return rectifiedL, rectifiedR
 
-def search_correspondence(image_left, image_right):
+def sift_correspondence(image_left, image_right):
     # Configurar o algoritmo SIFT
     sift = cv.SIFT_create()
 
@@ -40,6 +40,48 @@ def search_correspondence(image_left, image_right):
     for m, n in matches:
         if m.distance < 0.75 * n.distance:
             good_matches.append(m)
+
+    return good_matches, kpL, kpR
+
+def orb_correspondence(image_left, image_right):
+    # Configurar o algoritmo ORB
+    orb = cv.ORB_create()
+
+    # Encontrar keypoints e calcular descritores ORB
+    kpL, descL = orb.detectAndCompute(image_left, None)
+    kpR, descR = orb.detectAndCompute(image_right, None)
+
+    # Realizar correspondência de keypoints
+    bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)  # Usar Hamming distance para descritores binários
+    matches = bf.match(descL, descR)
+
+    # Filtrar correspondências
+    good_matches = []
+    threshold = 50
+    for match in matches:
+        if match.distance < threshold:
+            good_matches.append(match)
+
+    return good_matches, kpL, kpR
+
+def brisk_correspondence(image_left, image_right):
+    # Configurar o algoritmo BRISK
+    brisk = cv.BRISK_create()
+
+    # Encontrar keypoints e calcular descritores BRISK
+    kpL, descL = brisk.detectAndCompute(image_left, None)
+    kpR, descR = brisk.detectAndCompute(image_right, None)
+
+    # Realizar correspondência de keypoints
+    bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)  # Usar Hamming distance para descritores binários
+    matches = bf.match(descL, descR)
+
+    # Filtrar correspondências
+    good_matches = []
+    threshold = 50
+    for match in matches:
+        if match.distance < threshold:
+            good_matches.append(match)
 
     return good_matches, kpL, kpR
 
@@ -97,7 +139,8 @@ def generate_point_cloud(points_3d, colors):
 if __name__ == "__main__":
     stereoMapL_x, stereoMapL_y, stereoMapR_x, stereoMapR_y = load_camera_param('stereoMap.xml')
     image_left, image_right = remap_images('CasosCubo\Caso10\printL0.png', 'CasosCubo\Caso10\printR0.png', stereoMapL_x, stereoMapL_y, stereoMapR_x, stereoMapR_y)
-    good_matches, kpL, kpR = search_correspondence(image_left, image_right)
+    good_matches, kpL, kpR = sift_correspondence(image_left, image_right)
+    # good_matches, kpL, kpR = orb_correspondence(image_left, image_right)
+    # good_matches, kpL, kpR = brisk_correspondence(image_left, image_right)
     points_3d, colors = triangulation(good_matches, kpL, kpR, 'CasosCubo\Caso10\printL0.png')
     generate_point_cloud(points_3d, colors)
-
