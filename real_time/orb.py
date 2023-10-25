@@ -35,6 +35,13 @@ while cap.isOpened():
     matches = bf.match(descriptors_1, descriptors_2)
     good_matches = [match for match in matches if match.distance < 50]
 
+    # # Calcular profundidade e exibir na imagem
+    # for match in good_matches:
+    #     ptL = keypoints_1[match.queryIdx].pt
+    #     ptR = keypoints_2[match.trainIdx].pt
+    #     disparity = abs(ptL[0] - ptR[0])
+    #     depth = round((baseline * focal_length) / disparity)
+
     end = time.time()
     totalTime = end - start
 
@@ -43,6 +50,7 @@ while cap.isOpened():
     # Desenhar e exibir as correspondências encontradas
     img3 = cv2.drawMatches(img1_gray, keypoints_1, img2_gray, keypoints_2, matches, img2_gray, flags=2)
     cv2.putText(img3, f'ORB FPS: {int(fps)}', (20, 450), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
+    # cv2.putText(img3, f'Depth: {depth}', (int(ptR[0]), int(ptR[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2))
     cv2.imshow('ORB', img3)
 
     if cv2.waitKey(5) & 0xFF == ord('q'):
