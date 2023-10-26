@@ -71,7 +71,6 @@ def triangulation(good_matches, kpL, kpR, image_colored):
         ptL = kpL[match.queryIdx].pt
         ptR = kpR[match.trainIdx].pt
         disparity = abs(ptL[0] - ptR[0])
-        print(f"disparity: {disparity}")
         depth = round((baseline * focal_lenght) / disparity)
         list_z.append(depth)
         color = image_color[int(ptL[1]), int(ptL[0])]
@@ -89,7 +88,7 @@ def triangulation(good_matches, kpL, kpR, image_colored):
 
 def matches_and_depth_exibition(image_left, image_right, good_matches, most_depths, kpL, kpR):
     img_matches = cv.drawMatches(image_left, kpL, image_right, kpR,good_matches, None, flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-    cv.putText(img_matches, f"Depth: {most_depths[0][0]}", (20, 450), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+    cv.putText(img_matches, f"Depth: {most_depths[0][0]} cm", (20, 450), cv.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
     cv.imshow('Matches and Depth', img_matches)
     cv.waitKey(0)
     cv.destroyAllWindows()
@@ -119,9 +118,9 @@ def generate_point_cloud(points_3d, colors):
 
 if __name__ == "__main__":
     stereoMapL_x, stereoMapL_y, stereoMapR_x, stereoMapR_y = load_camera_param('stereoMap.xml')
-    image_left, image_right = remap_images('CasosCubo\Caso10\printL0.png', 'CasosCubo\Caso10\printR0.png', stereoMapL_x, stereoMapL_y, stereoMapR_x, stereoMapR_y)
-    # good_matches, kpL, kpR = sift_correspondence(image_left, image_right)
-    good_matches, kpL, kpR = orb_or_brisk_correspondence(image_left, image_right, 'BRISK')
+    image_left, image_right = remap_images('CasosCubo\Caso11\printL0.png', 'CasosCubo\Caso11\printR0.png', stereoMapL_x, stereoMapL_y, stereoMapR_x, stereoMapR_y)
+    good_matches, kpL, kpR = sift_correspondence(image_left, image_right)
+    # good_matches, kpL, kpR = orb_or_brisk_correspondence(image_left, image_right, 'BRISK')
     points_3d, colors, most_depths = triangulation(good_matches, kpL, kpR, 'CasosCubo\Caso10\printL0.png')
     matches_and_depth_exibition(image_left, image_right, good_matches, most_depths, kpL, kpR)
     generate_point_cloud(points_3d, colors)
