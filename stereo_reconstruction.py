@@ -65,13 +65,13 @@ def triangulation(good_matches, kpL, kpR, image_colored):
     image_color = cv.imread(f'{image_colored}', cv.COLOR_BGR2GRAY)
 
     baseline = 6.2
-    focal_lenght = 917.7
+    focal_length = 917.7
 
     for match in good_matches:
         ptL = kpL[match.queryIdx].pt
         ptR = kpR[match.trainIdx].pt
         disparity = abs(ptL[0] - ptR[0])
-        depth = round((baseline * focal_lenght) / disparity)
+        depth = round((baseline * focal_length) / disparity)
         list_z.append(depth)
         color = image_color[int(ptL[1]), int(ptL[0])]
         points_3d.append([ptL[0], ptL[1], abs(depth)])
